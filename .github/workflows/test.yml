@@ -1,0 +1,26 @@
+name: Test Action
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Setup Seeker Agent
+        uses: ./
+        with:
+          base-url: 'https://seeker.field-test.blackduck.com'
+          project-key: 'test-project'
+          access-token: ${{ secrets.SEEKER_ACCESS_TOKEN }}
+          agent-name: 'test-agent'
+      
+      - name: Verify agent was downloaded
+        run: |
+          if [ -f "test/seeker-agent.jar" ]; then
+            echo "✅ Agent downloaded successfully"
+            ls -la test/seeker-agent.jar
+          else
+            echo "❌ Agent not found"
+            exit 1
+          fi

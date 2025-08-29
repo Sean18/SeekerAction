@@ -1,0 +1,95 @@
+name: 'Setup Seeker Agent'
+description: 'Downloads and sets up BlackDuck Seeker agent for Java applications'
+author: 'Your Name'
+
+inputs:
+  base-url:
+    description: 'Base URL for the Seeker server'
+    required: true
+    default: 'https://seeker.field-test.blackduck.com'
+  
+  project-key:
+    description: 'Project key for Seeker'
+    required: true
+  
+  agent-name:
+    description: 'Name for the Seeker agent'
+    required: false
+    default: ''
+  
+  access-token:
+    description: 'Access token for Seeker API'
+    required: false
+    default: ''
+  
+  os-family:
+    description: 'Operating system family'
+    required: false
+    default: 'LINUX'
+  
+  web-server:
+    description: 'Web server type'
+    required: false
+    default: 'OTHER'
+  
+  flavor:
+    description: 'Agent flavor'
+    required: false
+    default: 'DEFAULT'
+  
+  output-path:
+    description: 'Path where to copy the seeker-agent.jar file'
+    required: false
+    default: 'test/seeker-agent.jar'
+
+outputs:
+  agent-path:
+    description: 'Path to the downloaded seeker agent jar'
+    value: ${{ steps.setup.outputs.agent-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Seeker Agent
+      id: setup
+      shell: bash
+      run: |
+        BASE_URL="${{ inputs.base-url }}"
+        PROJECT_KEY="${{ inputs.project-key }}"
+        AGENT_NAME="${{ inputs.agent-name }}"
+        ACCESS_TOKEN="${{ inputs.access-token }}"
+        OS_FAMILY="${{ inputs.os-family }}"
+        WEB_SERVER="${{ inputs.web-server }}"
+        FLAVOR="${{ inputs.flavor }}"
+        OUTPUT_PATH="${{ inputs.output-path }}"
+        
+        # Build the API URL
+        API_URL="${BASE_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=${OS_FAMILY}&downloadWith=curl&projectKey=${PROJECT_KEY}&webServer=${WEB_SERVER}&flavor=${FLAVOR}&agentName=${AGENT_NAME}&accessToken=${ACCESS_TOKEN}"
+        
+        echo "Downloading Seeker agent from: ${BASE_URL}"
+        echo "Project Key: ${PROJECT_KEY}"
+        echo "Agent Name: ${AGENT_NAME}"
+        
+        # Download and execute the installer script
+        sh -c "$(curl -k -X GET -fsSL --header 'Accept: application/x-sh' '${API_URL}')"
+        
+        # Copy the agent jar to specified location if output path is set
+        if [ -f "seeker/seeker-agent.jar" ]; then
+          if [ -n "${OUTPUT_PATH}" ]; then
+            # Create output directory if it doesn't exist
+            mkdir -p "$(dirname "${OUTPUT_PATH}")"
+            cp seeker/seeker-agent.jar "${OUTPUT_PATH}"
+            echo "agent-path=${OUTPUT_PATH}" >> $GITHUB_OUTPUT
+            echo "✅ Seeker agent successfully set up at: ${OUTPUT_PATH}"
+          else
+            echo "agent-path=seeker/seeker-agent.jar" >> $GITHUB_OUTPUT
+            echo "✅ Seeker agent successfully downloaded to: seeker/seeker-agent.jar"
+          fi
+        else
+          echo "❌ Failed to find seeker-agent.jar"
+          exit 1
+        fi
+
+branding:
+  icon: 'shield'
+  color: 'blue'
