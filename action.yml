@@ -33,9 +33,14 @@ inputs:
     default: 'OTHER'
   
   flavor:
-    description: 'Agent flavor'
+    description: 'Specific flavor of the target platform (DEFAULT, AZURE, AZURE_FUNCTION)'
     required: false
     default: 'DEFAULT'
+  
+  technology:
+    description: 'Technology platform (JAVA, DOTNETCORE, DOTNET, NODEJS, PHP, GO)'
+    required: false
+    default: 'JAVA'
   
   output-path:
     description: 'Path where to copy the seeker-agent.jar file'
@@ -61,10 +66,11 @@ runs:
         OS_FAMILY="${{ inputs.os-family }}"
         WEB_SERVER="${{ inputs.web-server }}"
         FLAVOR="${{ inputs.flavor }}"
+        TECHNOLOGY="${{ inputs.technology }}"
         OUTPUT_PATH="${{ inputs.output-path }}"
         
         # Build the API URL
-        API_URL="${BASE_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=${OS_FAMILY}&downloadWith=curl&projectKey=${PROJECT_KEY}&webServer=${WEB_SERVER}&flavor=${FLAVOR}&agentName=${AGENT_NAME}&accessToken=${ACCESS_TOKEN}"
+        API_URL="${BASE_URL}/rest/api/latest/installers/agents/scripts/${TECHNOLOGY}?osFamily=${OS_FAMILY}&downloadWith=curl&projectKey=${PROJECT_KEY}&webServer=${WEB_SERVER}&flavor=${FLAVOR}&agentName=${AGENT_NAME}&accessToken=${ACCESS_TOKEN}"
         
         echo "Downloading Seeker agent from: ${BASE_URL}"
         echo "Project Key: ${PROJECT_KEY}"
