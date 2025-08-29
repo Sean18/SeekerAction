@@ -13,7 +13,7 @@ jobs:
           base-url: 'https://seeker.field-test.blackduck.com'
           project-key: 'hippotech_github' ## must exist in seeker server, or download will get 404
           agent-name: 'test-agent'
-          output-path: 'test'
+          output-path: 'test/seeker-agent.jar'
       
       - name: Verify agent was downloaded
         run: |
