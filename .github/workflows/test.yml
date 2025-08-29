@@ -12,8 +12,8 @@ jobs:
         with:
           base-url: 'https://seeker.field-test.blackduck.com'
           project-key: 'test-project'
-          access-token: ${{ secrets.SEEKER_ACCESS_TOKEN }}
           agent-name: 'test-agent'
+          output-path: 'test'
       
       - name: Verify agent was downloaded
         run: |

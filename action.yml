@@ -69,9 +69,15 @@ runs:
         echo "Downloading Seeker agent from: ${BASE_URL}"
         echo "Project Key: ${PROJECT_KEY}"
         echo "Agent Name: ${AGENT_NAME}"
+        echo "Full API URL: ${API_URL}"
         
-        # Download and execute the installer script
-        sh -c "$(curl -k -X GET -fsSL --header 'Accept: application/x-sh' '${API_URL}')"
+        # Download and execute the installer script with verbose output
+        INSTALLER_SCRIPT=$(curl -k -X GET -fsSL --header 'Accept: application/x-sh' "${API_URL}")
+        
+        if [ $? -eq 0 ] && [ -n "$INSTALLER_SCRIPT" ]; then
+          echo "Executing installer script..."
+          echo "$INSTALLER_SCRIPT" | sh -s
+        fi
         
         # Copy the agent jar to specified location if output path is set
         if [ -f "seeker/seeker-agent.jar" ]; then
