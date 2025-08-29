@@ -11,7 +11,7 @@ jobs:
         uses: ./
         with:
           base-url: 'https://seeker.field-test.blackduck.com'
-          project-key: 'test-project'
+          project-key: 'hippotech_github' ## must exist in seeker server, or download will get 404
           agent-name: 'test-agent'
           output-path: 'test'
       
